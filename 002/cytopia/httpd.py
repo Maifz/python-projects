@@ -39,10 +39,10 @@ def send(s, data, verbose=False):
     if isinstance(data, bytes):
         data = b2str(data)
 
-    lines = data.split("\r\n")
+    lines = data.split("\n")
 
     for line in lines:
-        line += "\r\n"
+        line += "\n"
         size = len(line)
         line = line.encode()
         send = 0
@@ -80,6 +80,8 @@ def recv(s, bufsize=1024, verbose=False):
         # Newline terminates the read request
         if data.endswith("\n"):
             break
+        if data.endswith("\0"):
+            break
         # Sometimes a newline is missing at the end
         # If this round has the same data length as previous, we're done
         if size == len(data):
@@ -90,8 +92,94 @@ def recv(s, bufsize=1024, verbose=False):
 
 
 # -------------------------------------------------------------------------------------------------
-# HIGH-LEVEL COMMUNICATION FUNCTIONS
+# HIGH-LEVEL REQUEST/RESPOND FUNCTIONS
 # -------------------------------------------------------------------------------------------------
+
+def retrieve_request(s, host, port, bufsize=1024, verbose=False):
+    '''Get client request'''
+
+    data = recv(s, bufsize=bufsize, verbose=verbose)
+
+    # Client disconnected unexpectedly (without sending anything)
+    if data is None:
+        return
+
+    lines = data.split("\n")
+    if verbose:
+        for line in lines:
+            print('%s:%i < %s' % (host, port, line), file=sys.stderr)
+
+    # Extract HTTP Request from first line
+    regex = re.compile(r'(GET|POST|HEAD|PUT|DELETE|PATCH)\s+(.+)+\s+HTTP\/([1-2]\.[0-1])')
+    match = regex.match(lines[0])
+
+    # Check if request is valid
+    if match is None or len(match.groups()) != 3:
+        send(s, 'HTTP/1.1 400\r\n\r\nBad Request', verbose=verbose)
+        return
+
+    verb = match.group(1)
+    path = match.group(2)
+    vers = match.group(3)
+
+    return verb, path, vers
+
+
+def respond_get(s, path, vers, verbose=False):
+    '''Respond to a GET request to the client'''
+
+    if not os.path.isfile(path):
+        send(s, 'HTTP/'+vers+' 404\r\n\r\nFile not found', verbose=verbose)
+        return
+
+    ext = os.path.splitext(path)[1]
+
+    # Respond with 200
+    send(s, 'HTTP/'+vers+' 200 OK', verbose=verbose)
+
+    # Add content-type headers
+    if ext in ['.html', '.html']:
+        send(s, 'Content-Type: text/html; charset=utf-8\r\n', verbose=verbose)
+    elif ext in ['.json']:
+        send(s, 'Content-Type: application/json; charset=utf-8\r\n', verbose=verbose)
+    else:
+        send(s, 'Content-Type: text/plain; charset=utf-8\r\n', verbose=verbose)
+
+    # Serve the content
+    with open(path) as content:
+        line = content.read()
+        print(line)
+        send(s, line, verbose=verbose)
+
+
+# -------------------------------------------------------------------------------------------------
+# THREADED REQUEST SERVING
+# -------------------------------------------------------------------------------------------------
+
+def serve(s, host, port, docroot, index, bufsize=1024, verbose=False):
+    '''Threaded function to serve HTTP requests. One call per client'''
+
+    request = retrieve_request(s, host, port, bufsize=bufsize, verbose=verbose)
+    if request is None:
+        s.close()
+        return
+
+    # Split request
+    verb, path, vers = request
+
+    # Build filesystem path from document root and request path
+    path = '%s/%s' % (docroot, index) if path == '/' else '%s/%s' % (docroot, path)
+
+    if verb == 'GET':
+        respond_get(s, path, vers, verbose)
+    elif verb == 'HEAD':
+        send(s, 'HTTP/'+vers+' 200 OK\r\n', verbose=verbose)
+    else:
+        # TODO: Other HTTP verbs are not yet implemented
+        send(s, 'HTTP/'+vers+' 501\r\n\r\nNot implemented', verbose=verbose)
+
+    s.close()
+    return
 
 
 # -------------------------------------------------------------------------------------------------
@@ -156,67 +244,6 @@ def accept(s, verbose=False):
 # SERVER
 # -------------------------------------------------------------------------------------------------
 
-def serve(s, host, port, docroot, index, bufsize=1024, verbose=False):
-    '''Serve HTTP requests'''
-
-    data = recv(s, bufsize=1024, verbose=verbose)
-
-    if data is None:
-        s.close()
-        return
-
-    lines = data.split("\n")
-    if verbose:
-        for line in lines:
-            print('%s:%i < %s' % (host, port, line), file=sys.stderr)
-
-    regex = re.compile(r'(GET|POST|HEAD|PUT|DELETE|PATCH)\s+(.+)+\s+HTTP\/([1-2]\.[0-1])')
-    match = regex.match(lines[0])
-
-    # Check if request is valid
-    if match is None or len(match.groups()) != 3:
-        send(s, 'HTTP/1.1 400\r\n\r\nBad Request', verbose=verbose)
-        s.close()
-        return
-
-    verb = match.group(1)
-    path = match.group(2)
-    vers = match.group(3)
-    ext = os.path.splitext(path)[1]
-
-    if path == '/':
-        path = docroot + '/' + path + '/' + index
-    else:
-        path = docroot + '/' + path
-
-    if verb != 'GET':
-        send(s, 'HTTP/'+vers+' 501\r\n\r\nNot implemented', verbose=verbose)
-        s.close()
-        return
-
-    if not os.path.isfile(path):
-        send(s, 'HTTP/'+vers+' 404\r\n\r\nFile not found', verbose=verbose)
-        s.close()
-        return
-
-    send(s, 'HTTP/'+vers+' 200 OK', verbose=verbose)
-
-    if ext in ['.html', '.html']:
-        send(s, 'Content-Type: text/html; charset=utf-8\r\n', verbose=verbose)
-    elif ext in ['.json']:
-        send(s, 'Content-Type: application/json; charset=utf-8\r\n', verbose=verbose)
-    else:
-        send(s, 'Content-Type: text/plain; charset=utf-8\r\n', verbose=verbose)
-
-    with open(path) as content:
-        line = content.read()
-        print(line)
-        send(s, line, verbose=verbose)
-
-    # Close connection when thread stops
-    s.close()
-
-
 def run_server(host, port, docroot, index, backlog=1, bufsize=1024, verbose=False):
     '''Start TCP/UDP server on host/port and wait endlessly to sent/receive data'''
 
@@ -232,6 +259,7 @@ def run_server(host, port, docroot, index, backlog=1, bufsize=1024, verbose=Fals
 
     # Accept clients
     while True:
+        # Blocking call until a new client connects
         c, h, p = accept(s, verbose=verbose)
         t = threading.Thread(target=serve, args=(c, ), kwargs={
             'host': h,
@@ -278,9 +306,9 @@ def get_args():
     parser = argparse.ArgumentParser(description='Python httpd server.')
     parser.add_argument('-v', '--verbose', action='store_true', required=False,
                         help='be verbose and print info to stderr')
-    parser.add_argument('-d', '--docroot', metavar='DIR', required=True,
+    parser.add_argument('-r', '--root', metavar='DIR', required=True,
                         type=_args_check_docroot, help='path from where to serve documents')
-    parser.add_argument('-i', '--index', type=str, default='index.html', required=False,
+    parser.add_argument('-i', '--index', metavar='FILE', default='index.html', required=False,
                         help='defines the file that will be served as index (default: index.html)')
     parser.add_argument('hostname', type=str, help='address to listen on')
     parser.add_argument('port', type=_args_check_port, help='port to listen on')
@@ -302,7 +330,7 @@ def main():
     run_server(
         args.hostname,
         args.port,
-        args.docroot,
+        args.root,
         args.index,
         backlog=listen_backlog,
         bufsize=receive_buffer,
