@@ -15,6 +15,7 @@ class Webserver(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-Type', self.args_helper.getContentType())
+        self.end_headers()
         self.wfile.write(Webserver.file_handler.readFile(self.args_helper.getIndexFilePath()))
 
     def do_POST(self):
