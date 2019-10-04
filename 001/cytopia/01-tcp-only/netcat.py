@@ -176,11 +176,7 @@ def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
             print('Listening:', ' backlog=' + str(backlog), file=sys.stderr)
         s.listen(backlog)
 
-    except OverflowError as msg:
-        s.close()
-        print(msg, file=sys.stderr)
-        sys.exit(1)
-    except socket.error as msg:
+    except (OverflowError, socket.error) as msg:
         s.close()
         print(msg, file=sys.stderr)
         sys.exit(1)
