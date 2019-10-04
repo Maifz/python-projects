@@ -15,7 +15,8 @@ class Webserver(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-Type', self.args_helper.getContentType())
-        Webserver.file_handler.readFile()
+        self.wfile.write(Webserver.file_handler.readFile(self.args_helper.getIndexFilePath()))
+
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
@@ -28,7 +29,8 @@ class Webserver(BaseHTTPRequestHandler):
 PORT = 8000
 SERVER_ADDRESS = '127.0.0.1'
 CONTENT_TYPE = "text/plain"
-
+DEFAULT_FILE = "test.txt"
+DEFAULT_INDEX_FILE = "index.html"
 
 def run_server(server_address, port):
     server = HTTPServer((server_address, port), Webserver)
@@ -57,10 +59,26 @@ def main():
         default=CONTENT_TYPE,
         help="Content Type, accepts text or text/plain"
     )
+    parser.add_argument(
+        "-fp",
+        "--file-path",
+        type=str,
+        default=DEFAULT_FILE,
+        help="file-path to write text of POST",
+        dest="file_path"
+    )
+    parser.add_argument(
+        "-ip",
+        "--index-path",
+        type=str,
+        default=DEFAULT_INDEX_FILE,
+        help="file-path to your index.html",
+        dest="index_file_path"
+    )
     args = parser.parse_args()
     args_helper = ArgsHelper.getInstance()
-    args_helper.setContentType(args.type)
-    print(args_helper.getContentType())
+    args_helper.initializeArguments(args.type, args.file_path, args.index_file_path)
+
     run_server(args.listen, args.port)
 
 

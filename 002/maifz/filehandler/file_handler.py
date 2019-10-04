@@ -2,9 +2,9 @@ class FileHandler():
 
     def appendToFile(self, file_path, data):
         with open(file_path, 'a') as file:
-            file.write(data + '\n\r')
+            file.write(str(data) + '\n\r')
 
-    def readFile(self):
+    def readFile(self, file_path):
         with open('index.html', 'rb') as file:
-            file.read()
-        print("read")
+            return file.read()
+
