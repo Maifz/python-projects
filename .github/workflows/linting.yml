@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        job: [lint]
+        job: [files, json, python]
 
     name: "[ ${{ matrix.job }} ]"
     steps:
@@ -17,10 +17,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          docker pull cytopia/pycodestyle
-
+          make "_pull-${job}"
+        env:
+          job: ${{ matrix.job }}
       - name: Run
         run: |
-          make "${job}"
+          make "lint-${job}"
         env:
           job: ${{ matrix.job }}
