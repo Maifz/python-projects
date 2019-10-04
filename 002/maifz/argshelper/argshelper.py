@@ -1,7 +1,7 @@
 class ArgsHelper:
     __instance = None
 
-    ### DEFAULTS
+    # DEFAULTS
     DEFAULT_CONTENT_TYPE = "text/plain"
     DEFAULT_FILE_PATH_WRITE = "test.txt"
     DEFAULT_INDEX_FILE_PATH = "../index.html"
@@ -13,13 +13,13 @@ class ArgsHelper:
     @staticmethod
     def getInstance():
         """ Static access method. """
-        if ArgsHelper.__instance == None:
+        if ArgsHelper.__instance is None:
             ArgsHelper()
         return ArgsHelper.__instance
 
     def __init__(self):
         """ Virtually private constructor. """
-        if ArgsHelper.__instance != None:
+        if ArgsHelper.__instance is not None:
             raise Exception("This class is a'index.html' singleton!")
         else:
             ArgsHelper.__instance = self
@@ -47,4 +47,3 @@ class ArgsHelper:
         self.setWriteFilePath(self.DEFAULT_FILE_PATH_WRITE if fpw is None else fpw)
         self.setIndexFilePath(self.DEFAULT_INDEX_FILE_PATH if ifp is None else ifp)
         print(ifp)
-

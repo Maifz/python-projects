@@ -1,10 +1,10 @@
 import argparse
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from filehandler.file_handler import FileHandler
-from argshelper.args_helper import ArgsHelper
+import sys
+import os
+from http.server import HTTPServer
+from http.server import BaseHTTPRequestHandler
+from filehandler import FileHandler
+from argshelper import ArgsHelper
 
 
 class Webserver(BaseHTTPRequestHandler):
@@ -16,7 +16,6 @@ class Webserver(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-Type', self.args_helper.getContentType())
         self.wfile.write(Webserver.file_handler.readFile(self.args_helper.getIndexFilePath()))
-
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
@@ -31,6 +30,7 @@ SERVER_ADDRESS = '127.0.0.1'
 CONTENT_TYPE = "text/plain"
 DEFAULT_FILE = "test.txt"
 DEFAULT_INDEX_FILE = "index.html"
+
 
 def run_server(server_address, port):
     server = HTTPServer((server_address, port), Webserver)
@@ -88,4 +88,3 @@ if __name__ == '__main__':
     except KeyboardInterrupt as msg:
         print("cancel")
         sys.exit(1)
-

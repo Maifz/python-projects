@@ -7,5 +7,3 @@ class FileHandler():
     def readFile(self, file_path):
         with open('index.html', 'rb') as file:
             return file.read()
-
-
