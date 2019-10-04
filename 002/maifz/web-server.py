@@ -31,7 +31,10 @@ class Webserver(BaseHTTPRequestHandler):
             self.send_response(411)
             return
 
-        response = Webserver.file_handler.appendToFile(self.args_helper.getWriteFilePath(), post_data)
+        response = Webserver.file_handler.appendToFile(
+            self.args_helper.getWriteFilePath(),
+            post_data
+        )
 
         if not response:
             self.send_response(404)
