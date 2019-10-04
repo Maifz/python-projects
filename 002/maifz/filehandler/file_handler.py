@@ -8,3 +8,4 @@ class FileHandler():
         with open('index.html', 'rb') as file:
             return file.read()
 
+
