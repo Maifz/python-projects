@@ -8,7 +8,7 @@ endif
 # File-lint configuration
 # --------------------------------------------------------------------------------
 FL_VERSION = 0.2
-FL_IGNORES = .git/,.github/,*/.terragrunt-cache/,*/.terraform/,.idea/
+FL_IGNORES = .git/,.github/
 
 
 # --------------------------------------------------------------------------------
@@ -38,12 +38,12 @@ lint-files: _pull-files
 	@echo "################################################################################"
 	@echo "# File lint"
 	@echo "################################################################################"
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '$(FL_IGNORES)' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm -v ${PWD}:/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm -v ${PWD}:/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm -v ${PWD}:/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm -v ${PWD}:/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm -v ${PWD}:/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '$(FL_IGNORES)' --path .
+	@docker run --rm -v ${PWD}:/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '$(FL_IGNORES)' --path .
 	@echo
 
 
@@ -51,7 +51,7 @@ lint-json: _pull-json
 	@echo "################################################################################"
 	@echo "# JSON lint"
 	@echo "################################################################################"
-	@if docker run --rm -v "$(CURRENT_DIR)/terraform:/data:ro" cytopia/jsonlint:$(JL_VERSION) \
+	@if docker run --rm -v "${PWD}:/data:ro" cytopia/jsonlint:$(JL_VERSION) \
 		-t '  ' -i '$(JL_IGNORES)' '*.json'; then \
 		echo "OK"; \
 	else \
