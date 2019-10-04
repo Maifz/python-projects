@@ -20,7 +20,7 @@ class ArgsHelper:
     def __init__(self):
         """ Virtually private constructor. """
         if ArgsHelper.__instance is not None:
-            raise Exception("This class is a'index.html' singleton!")
+            raise Exception("This class is a singleton")
         else:
             ArgsHelper.__instance = self
 
