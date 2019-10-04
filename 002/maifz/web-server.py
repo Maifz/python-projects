@@ -13,16 +13,32 @@ class Webserver(BaseHTTPRequestHandler):
     args_helper = ArgsHelper.getInstance()
 
     def do_GET(self):
+
+        try:
+            self.wfile.write(Webserver.file_handler.readFile(self.args_helper.getIndexFilePath()))
+        except FileNotFoundError:
+            self.send_response(404)
+            return
+
         self.send_response(200)
         self.send_header('Content-Type', self.args_helper.getContentType())
         self.end_headers()
-        self.wfile.write(Webserver.file_handler.readFile(self.args_helper.getIndexFilePath()))
 
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+        except TypeError:
+            self.send_response(411)
+            return
+
+        response = Webserver.file_handler.appendToFile(self.args_helper.getWriteFilePath(), post_data)
+
+        if not response:
+            self.send_response(404)
+            return
+
         self.send_response(200)
-        Webserver.file_handler.appendToFile(self.args_helper.getWriteFilePath(), post_data)
         print(post_data)
 
 
