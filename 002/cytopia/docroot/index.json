@@ -1,12 +1,12 @@
 {
-  "alex": {
-    "kann": "nix",
-    "ist": "kacke",
-    "clit": "riesig"
+  "object1": {
+    "key1": "value1",
+    "key2": "value2",
+    "key3": "value3"
   },
-  "patrick": {
-    "kann": "alles",
-    "ist": "geil",
-    "penis": "maechtig"
+  "object2": {
+    "key1": "value1",
+    "key2": "value2",
+    "key3": "value3"
   }
 }
