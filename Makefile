@@ -2,7 +2,7 @@ ifneq (,)
 .error This Makefile requires GNU Make.
 endif
 
-.PHONY: lint-files lint-json lint-python _pull-files _pull-json _pull-python
+.PHONY: all lint-files lint-json lint-python _pull-files _pull-json _pull-python
 
 # --------------------------------------------------------------------------------
 # File-lint configuration
@@ -22,9 +22,16 @@ JL_IGNORES = *.terraform/*
 # Targets
 # --------------------------------------------------------------------------------
 help:
+	@echo "lint-all     Lint all targets below"
 	@echo "lint-files   Lint and test all files"
 	@echo "lint-json    Lint JSON files"
 	@echo "lint-python  Lint Python files"
+
+
+lint-all:
+	@$(MAKE) --no-print-directory lint-files
+	@$(MAKE) --no-print-directory lint-json
+	@$(MAKE) --no-print-directory lint-python
 
 
 lint-files: _pull-files
