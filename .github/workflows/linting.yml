@@ -1,0 +1,26 @@
+---
+
+name: Python
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job: [lint]
+
+    name: "[ ${{ matrix.job }} ]"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Install dependencies
+        run: |
+          docker pull cytopia/pycodestyle
+
+      - name: Run
+        run: |
+          make "${job}"
+        env:
+          job: ${{ matrix.job }}
