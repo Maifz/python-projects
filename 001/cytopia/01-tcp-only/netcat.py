@@ -14,15 +14,15 @@ def b2str(data):
     '''Convert bytes into string type'''
     try:
         return data.decode('utf-8')
-    except:
+    except UnicodeDecodeError:
         pass
     try:
         return data.decode('utf-8-sig')
-    except:
+    except UnicodeDecodeError:
         pass
     try:
         return data.decode('ascii')
-    except:
+    except UnicodeDecodeError:
         return data.decode('latin-1')
 
 
@@ -49,7 +49,7 @@ def send(s, crlf=False, verbose=False):
         # Convert back to bytes and send
         try:
             s.sendall(data.encode())
-        except socket.error as err:
+        except socket.error:
             if verbose:
                 print('Upstream connection is gone while sending', file=sys.stderr)
             s.close()
@@ -136,8 +136,14 @@ def connect(host, port, bufsize=1024, crlf=False, verbose=False):
         sys.exit(1)
 
     # Start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(s, ), kwargs={'bufsize': bufsize, 'verbose': verbose})
-    ts = threading.Thread(target=send, args=(s, ), kwargs={'crlf': crlf, 'verbose': verbose})
+    tr = threading.Thread(target=receive, args=(s, ), kwargs={
+        'bufsize': bufsize,
+        'verbose': verbose
+    })
+    ts = threading.Thread(target=send, args=(s, ), kwargs={
+        'crlf': crlf,
+        'verbose': verbose
+    })
     # If the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
@@ -189,8 +195,14 @@ def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
         print('Receiving: ', 'bufsize=' + str(bufsize), file=sys.stderr)
 
     # Start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(c, ), kwargs={'bufsize': bufsize, 'verbose': verbose})
-    ts = threading.Thread(target=send, args=(c, ), kwargs={'crlf': crlf, 'verbose': verbose})
+    tr = threading.Thread(target=receive, args=(c, ), kwargs={
+        'bufsize': bufsize,
+        'verbose': verbose
+    })
+    ts = threading.Thread(target=send, args=(c, ), kwargs={
+        'crlf': crlf,
+        'verbose': verbose
+    })
     # If the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
