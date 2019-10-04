@@ -47,8 +47,8 @@ def send(s, udp=False, crlf=False, verbose=False):
 
     # In case of sending data back to an udp client we need to wait
     # until the client has first connected and told us its addr/port
-    if udp and UDP_CLIENT_ADDR == None and UDP_CLIENT_PORT == None:
-        while UDP_CLIENT_ADDR == None and UDP_CLIENT_PORT == None:
+    if udp and UDP_CLIENT_ADDR is None and UDP_CLIENT_PORT is None:
+        while UDP_CLIENT_ADDR is None and UDP_CLIENT_PORT is None:
             pass
         if verbose:
             print('Client:     %s:%i' % (UDP_CLIENT_ADDR, UDP_CLIENT_PORT), file=sys.stderr)
