@@ -22,7 +22,7 @@ class Webserver(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
         self.send_response(200)
-        Webserver.file_handler.appendToFile('test.txt', post_data)
+        Webserver.file_handler.appendToFile(self.args_helper.getWriteFilePath(), post_data)
         print(post_data)
 
 
