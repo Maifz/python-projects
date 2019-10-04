@@ -1,5 +1,6 @@
 ## Simple Webserver
-
+![Language](https://img.shields.io/badge/Python-3-red.svg)
+[![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 ##### Usage
 ```bash
 ./web-server.py -h
