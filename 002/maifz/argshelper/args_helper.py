@@ -47,3 +47,4 @@ class ArgsHelper:
         self.setWriteFilePath(self.DEFAULT_FILE_PATH_WRITE if fpw is None else fpw)
         self.setIndexFilePath(self.DEFAULT_INDEX_FILE_PATH if ifp is None else ifp)
         print(ifp)
+
