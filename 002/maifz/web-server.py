@@ -86,6 +86,6 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except KeyboardInterrupt as msg:
+    except KeyboardInterrupt:
         print("\ncancel\n")
         sys.exit(1)
