@@ -29,12 +29,12 @@ optional arguments:
 listen to another port
 ```bash
 ./web-server.py -p 8080
-``` 
+```
 
 listen to another ip
 ```bash
 ./web-server.py -l "192.168.199.199"
-``` 
+```
 
 change the index.html
 ```bash
@@ -50,4 +50,3 @@ change the file where the post should write into
 ```bash
 ./web-server.py -fp "path/to/your.txt"
 ```
-
