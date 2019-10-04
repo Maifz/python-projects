@@ -1,10 +1,10 @@
+#!/usr/bin/env python3
 import argparse
 import sys
-import os
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
-from filehandler import FileHandler
-from argshelper import ArgsHelper
+from filehandler.filehandler import FileHandler
+from argshelper.argshelper import ArgsHelper
 
 
 class Webserver(BaseHTTPRequestHandler):
@@ -86,5 +86,5 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt as msg:
-        print("cancel")
+        print("\ncancel\n")
         sys.exit(1)
