@@ -1,3 +1,6 @@
+import sys
+
+
 class FileHandler():
 
     def appendToFile(self, file_path, data):
@@ -5,5 +8,9 @@ class FileHandler():
             file.write(data.decode('utf-8') + '\n\r')
 
     def readFile(self, file_path):
-        with open(file_path, 'rb') as file:
-            return file.read()
+        try:
+            with open(file_path, 'rb') as file:
+                return file.read()
+        except FileNotFoundError:
+            print("Your html file doesn't exist")
+            sys.exit(1)
