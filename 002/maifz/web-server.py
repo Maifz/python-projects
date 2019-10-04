@@ -13,7 +13,6 @@ class Webserver(BaseHTTPRequestHandler):
     args_helper = ArgsHelper.getInstance()
 
     def do_GET(self):
-
         try:
             self.wfile.write(Webserver.file_handler.readFile(self.args_helper.getIndexFilePath()))
         except FileNotFoundError:
