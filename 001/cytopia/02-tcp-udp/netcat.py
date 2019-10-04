@@ -26,15 +26,15 @@ def b2str(data):
     '''Convert bytes into string type'''
     try:
         return data.decode('utf-8')
-    except:
+    except UnicodeDecodeError:
         pass
     try:
         return data.decode('utf-8-sig')
-    except:
+    except UnicodeDecodeError:
         pass
     try:
         return data.decode('ascii')
-    except:
+    except UnicodeDecodeError:
         return data.decode('latin-1')
 
 
@@ -147,9 +147,9 @@ def receive(s, udp=False, bufsize=1024, verbose=False):
 # CLIENT/SERVER INITIALIZATION FUNCTIONS
 # -------------------------------------------------------------------------------------------------
 
-###
-### Server/Client (TCP+UDP)
-###
+#
+# Server/Client (TCP+UDP)
+#
 def create_socket(udp=False, verbose=False):
     '''Create TCP or UDP socket'''
     try:
@@ -166,9 +166,9 @@ def create_socket(udp=False, verbose=False):
         sys.exit(1)
 
 
-###
-### Server (TCP+UDP)
-###
+#
+# Server (TCP+UDP)
+#
 def bind(s, host, port, verbose=False):
     '''Bind TCP or UDP socket to host/port'''
     if verbose:
@@ -182,9 +182,9 @@ def bind(s, host, port, verbose=False):
         sys.exit(1)
 
 
-###
-### Server (TCP only)
-###
+#
+# Server (TCP only)
+#
 def listen(s, backlog=1, verbose=False):
     '''Make TCP socket listen'''
     try:
@@ -198,9 +198,9 @@ def listen(s, backlog=1, verbose=False):
         sys.exit(1)
 
 
-###
-### Server (TCP only)
-###
+#
+# Server (TCP only)
+#
 def accept(s, verbose=False):
     '''Accept connections on TCP socket'''
     try:
@@ -218,9 +218,9 @@ def accept(s, verbose=False):
     return c
 
 
-###
-### Client (TCP+UDP)
-###
+#
+# Client (TCP+UDP)
+#
 def resolve(hostname, verbose=False):
     '''Resolve hostname to IP addr or return False in case of error'''
     if verbose:
@@ -232,9 +232,9 @@ def resolve(hostname, verbose=False):
         return False
 
 
-###
-### Client (TCP+UDP)
-###
+#
+# Client (TCP+UDP)
+#
 def connect(s, addr, port, verbose=False):
     '''Connect to a server via IP addr/port'''
     if verbose:
@@ -272,8 +272,16 @@ def run_client(host, port, udp=False, bufsize=1024, crlf=False, verbose=False):
         connect(s, addr, port, verbose=verbose)
 
     # Start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(s, ), kwargs={'udp': udp, 'bufsize': bufsize, 'verbose': verbose})
-    ts = threading.Thread(target=send, args=(s, ), kwargs={'udp': udp, 'crlf': crlf, 'verbose': verbose})
+    tr = threading.Thread(target=receive, args=(s, ), kwargs={
+        'udp': udp,
+        'bufsize': bufsize,
+        'verbose': verbose
+    })
+    ts = threading.Thread(target=send, args=(s, ), kwargs={
+        'udp': udp,
+        'crlf': crlf,
+        'verbose': verbose
+    })
     # If the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
@@ -309,8 +317,16 @@ def run_server(host, port, udp=False, backlog=1, bufsize=1024, crlf=False, verbo
         c = s
 
     # start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(c, ), kwargs={'udp': udp, 'bufsize': bufsize, 'verbose': verbose})
-    ts = threading.Thread(target=send, args=(c, ), kwargs={'udp': udp, 'crlf': crlf, 'verbose': verbose})
+    tr = threading.Thread(target=receive, args=(c, ), kwargs={
+        'udp': udp,
+        'bufsize': bufsize,
+        'verbose': verbose
+    })
+    ts = threading.Thread(target=send, args=(c, ), kwargs={
+        'udp': udp,
+        'crlf': crlf,
+        'verbose': verbose
+    })
     # if the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
@@ -371,7 +387,6 @@ def main():
     args = get_args()
 
     listen_backlog = 1
-    #receive_buffer = 4096
     receive_buffer = 1024
 
     if args.listen:
