@@ -46,4 +46,3 @@ class ArgsHelper:
         self.setContentType(self.DEFAULT_CONTENT_TYPE if ct is None else ct)
         self.setWriteFilePath(self.DEFAULT_FILE_PATH_WRITE if fpw is None else fpw)
         self.setIndexFilePath(self.DEFAULT_INDEX_FILE_PATH if ifp is None else ifp)
-
