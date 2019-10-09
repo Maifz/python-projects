@@ -20,20 +20,19 @@ class Webserver(BaseHTTPRequestHandler):
             return
 
         self.send_response(200)
-        self.send_header('Content-Type', self.args_helper.getContentType())
+        self.send_header("Content-Type", self.args_helper.getContentType())
         self.end_headers()
 
     def do_POST(self):
         try:
-            content_length = int(self.headers['Content-Length'])
+            content_length = int(self.headers["Content-Length"])
             post_data = self.rfile.read(content_length)
         except TypeError:
             self.send_response(411)
             return
 
         response = Webserver.file_handler.appendToFile(
-            self.args_helper.getWriteFilePath(),
-            post_data
+            self.args_helper.getWriteFilePath(), post_data
         )
 
         if not response:
@@ -45,7 +44,7 @@ class Webserver(BaseHTTPRequestHandler):
 
 
 PORT = 8000
-SERVER_ADDRESS = '127.0.0.1'
+SERVER_ADDRESS = "127.0.0.1"
 CONTENT_TYPE = "text/plain"
 DEFAULT_FILE = "test.txt"
 DEFAULT_INDEX_FILE = "index.html"
@@ -57,26 +56,26 @@ def run_server(server_address, port):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Simple Webserver')
+    parser = argparse.ArgumentParser(description="Simple Webserver")
     parser.add_argument(
         "-l",
         "--listen",
         default=SERVER_ADDRESS,
-        help="IP-address on which your server should listen - default= " + str(SERVER_ADDRESS)
+        help="IP-address on which your server should listen - default= " + str(SERVER_ADDRESS),
     )
     parser.add_argument(
         "-p",
         "--port",
         type=int,
         default=PORT,
-        help="Port on which your server should listen - default= " + str(PORT)
+        help="Port on which your server should listen - default= " + str(PORT),
     )
     parser.add_argument(
         "-t",
         "--type",
         type=str,
         default=CONTENT_TYPE,
-        help="Content Type, accepts text or text/plain"
+        help="Content Type, accepts text or text/plain",
     )
     parser.add_argument(
         "-fp",
@@ -84,7 +83,7 @@ def main():
         type=str,
         default=DEFAULT_FILE,
         help="file-path to write text of POST",
-        dest="file_path"
+        dest="file_path",
     )
     parser.add_argument(
         "-ip",
@@ -92,7 +91,7 @@ def main():
         type=str,
         default=DEFAULT_INDEX_FILE,
         help="file-path to your index.html",
-        dest="index_file_path"
+        dest="index_file_path",
     )
     args = parser.parse_args()
     args_helper = ArgsHelper.getInstance()
@@ -101,7 +100,7 @@ def main():
     run_server(args.listen, args.port)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
