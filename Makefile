@@ -2,7 +2,7 @@ ifneq (,)
 .error This Makefile requires GNU Make.
 endif
 
-.PHONY: all lint-files lint-json lint-python-pyc lint-python-pyd _pull-files _pull-json _pull-python-pyc _pull-python-pyd
+.PHONY: all lint-files lint-json lint-python-black lint-python-pycodestyle lint-python-pydocstyle _pull-files _pull-json _pull-python-black _pull-python-pycodestyle _pull-python-pydocstyle
 
 # --------------------------------------------------------------------------------
 # File-lint configuration
@@ -22,18 +22,20 @@ JL_IGNORES = .idea/*
 # Targets
 # --------------------------------------------------------------------------------
 help:
-	@echo "lint-all         Lint all targets below"
-	@echo "lint-files       Lint and test all files"
-	@echo "lint-json        Lint JSON files"
-	@echo "lint-python-pyc  Lint Python files against pycodestyle"
-	@echo "lint-python-pyd  Lint Python files against pydocstyle"
+	@echo "lint-all                 Lint all targets below"
+	@echo "lint-files               Lint and test all files"
+	@echo "lint-json                Lint JSON files"
+	@echo "lint-python-pycodestyle  Lint Python files against pycodestyleodestyle"
+	@echo "lint-python-pydocstyle   Lint Python files against pydocstyleocstyle"
+	@echo "lint-python-black        Lint Python files against black (code formatter)"
 
 
 lint-all:
 	@$(MAKE) --no-print-directory lint-files
 	@$(MAKE) --no-print-directory lint-json
-	@$(MAKE) --no-print-directory lint-python-pyc
-	@$(MAKE) --no-print-directory lint-python-pyd
+	@$(MAKE) --no-print-directory lint-python-pycodestyle
+	@$(MAKE) --no-print-directory lint-python-pydocstyle
+	@$(MAKE) --no-print-directory lint-python-black
 
 
 lint-files: _pull-files
@@ -63,18 +65,28 @@ lint-json: _pull-json
 	@echo
 
 
-lint-python-pyc: _pull-python-pyc
+lint-python-black: _pull-python-black
+	@echo "################################################################################"
+	@echo "# Python code formatting (black)"
+	@echo "################################################################################"
+	@docker run --rm -v ${PWD}:/data cytopia/black --diff --check -l 100 .
+	@echo
+
+
+lint-python-pycodestyle: _pull-python-pycodestyle
 	@echo "################################################################################"
 	@echo "# Python lint (pycodestyle)"
 	@echo "################################################################################"
 	@docker run --rm -v ${PWD}:/data cytopia/pycodestyle .
+	@echo
 
 
-lint-python-pyd: _pull-python-pyd
+lint-python-pydocstyle: _pull-python-pydocstyle
 	@echo "################################################################################"
 	@echo "# Python lint (pydocstyle)"
 	@echo "################################################################################"
 	@docker run --rm -v ${PWD}:/data cytopia/pydocstyle .
+	@echo
 
 
 # --------------------------------------------------------------------------------
@@ -88,9 +100,13 @@ _pull-json:
 	@docker pull cytopia/jsonlint:$(JL_VERSION)
 
 
-_pull-python-pyc:
+_pull-python-black:
+	@docker pull cytopia/black:latest
+
+
+_pull-python-pycodestyle:
 	@docker pull cytopia/pycodestyle:latest
 
 
-_pull-python-pyd:
+_pull-python-pydocstyle:
 	@docker pull cytopia/pydocstyle:latest

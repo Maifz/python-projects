@@ -1,0 +1,27 @@
+---
+
+name: Python
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job: [pycodestyle, pydocstyle, black]
+
+    name: "[ ${{ matrix.job }} ]"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Install dependencies
+        run: |
+          make "_pull-python-${job}"
+        env:
+          job: ${{ matrix.job }}
+      - name: Run
+        run: |
+          make "lint-python-${job}"
+        env:
+          job: ${{ matrix.job }}
