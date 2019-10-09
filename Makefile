@@ -98,20 +98,20 @@ lint-python-pydocstyle: _pull-python-pydocstyle
 # Helper Targets
 # --------------------------------------------------------------------------------
 _pull-files:
-	@docker pull cytopia/file-lint:$(FL_VERSION)
+	@docker pull cytopia/file-lint:$(FL_VERSION) >/dev/null
 
 
 _pull-json:
-	@docker pull cytopia/jsonlint:$(JL_VERSION)
+	@docker pull cytopia/jsonlint:$(JL_VERSION) >/dev/null
 
 
 _pull-python-black:
-	@docker pull cytopia/black:latest
+	@docker pull cytopia/black:latest >/dev/null
 
 
 _pull-python-pycodestyle:
-	@docker pull cytopia/pycodestyle:latest
+	@docker pull cytopia/pycodestyle:latest >/dev/null
 
 
 _pull-python-pydocstyle:
-	@docker pull cytopia/pydocstyle:latest
+	@docker pull cytopia/pydocstyle:latest >/dev/null
