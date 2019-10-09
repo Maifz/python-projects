@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Python netcat implementation for TCP and UDP."""
 
 import argparse
 import socket
@@ -23,7 +24,7 @@ UDP_CLIENT_PORT = None
 # -------------------------------------------------------------------------------------------------
 
 def b2str(data):
-    '''Convert bytes into string type'''
+    """Convert bytes into string type."""
     try:
         return data.decode('utf-8')
     except UnicodeDecodeError:
@@ -43,8 +44,7 @@ def b2str(data):
 # -------------------------------------------------------------------------------------------------
 
 def send(s, udp=False, crlf=False, verbose=False):
-    '''Send one newline terminated line to a connected socket'''
-
+    """Send one newline terminated line to a connected socket."""
     # In case of sending data back to an udp client we need to wait
     # until the client has first connected and told us its addr/port
     if udp and UDP_CLIENT_ADDR is None and UDP_CLIENT_PORT is None:
@@ -89,8 +89,7 @@ def send(s, udp=False, crlf=False, verbose=False):
 
 
 def receive(s, udp=False, bufsize=1024, verbose=False):
-    '''Read one newline terminated line from a connected socket'''
-
+    """Read one newline terminated line from a connected socket."""
     global UDP_CLIENT_ADDR
     global UDP_CLIENT_PORT
 
@@ -151,7 +150,7 @@ def receive(s, udp=False, bufsize=1024, verbose=False):
 # Server/Client (TCP+UDP)
 #
 def create_socket(udp=False, verbose=False):
-    '''Create TCP or UDP socket'''
+    """Create TCP or UDP socket."""
     try:
         if udp:
             if verbose:
@@ -170,7 +169,7 @@ def create_socket(udp=False, verbose=False):
 # Server (TCP+UDP)
 #
 def bind(s, host, port, verbose=False):
-    '''Bind TCP or UDP socket to host/port'''
+    """Bind TCP or UDP socket to host/port."""
     if verbose:
         print('Binding:    %s:%i' % (host, port), file=sys.stderr)
     try:
@@ -186,7 +185,7 @@ def bind(s, host, port, verbose=False):
 # Server (TCP only)
 #
 def listen(s, backlog=1, verbose=False):
-    '''Make TCP socket listen'''
+    """Make TCP socket listen."""
     try:
         if verbose:
             print('Listening:  backlog=%i' % (backlog), file=sys.stderr)
@@ -202,7 +201,7 @@ def listen(s, backlog=1, verbose=False):
 # Server (TCP only)
 #
 def accept(s, verbose=False):
-    '''Accept connections on TCP socket'''
+    """Accept connections on TCP socket."""
     try:
         c, addr = s.accept()
     except (socket.gaierror, socket.error) as error:
@@ -222,7 +221,7 @@ def accept(s, verbose=False):
 # Client (TCP+UDP)
 #
 def resolve(hostname, verbose=False):
-    '''Resolve hostname to IP addr or return False in case of error'''
+    """Resolve hostname to IP addr or return False in case of error."""
     if verbose:
         print('Resolving:  %s' % (hostname), file=sys.stderr)
     try:
@@ -236,7 +235,7 @@ def resolve(hostname, verbose=False):
 # Client (TCP+UDP)
 #
 def connect(s, addr, port, verbose=False):
-    '''Connect to a server via IP addr/port'''
+    """Connect to a server via IP addr/port."""
     if verbose:
         print('Connecting: %s:%i' % (addr, port), file=sys.stderr)
     try:
@@ -253,8 +252,7 @@ def connect(s, addr, port, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def run_client(host, port, udp=False, bufsize=1024, crlf=False, verbose=False):
-    '''Connect to host:port and send data'''
-
+    """Connect to host:port and send data."""
     global UDP_CLIENT_ADDR
     global UDP_CLIENT_PORT
 
@@ -304,8 +302,7 @@ def run_client(host, port, udp=False, bufsize=1024, crlf=False, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def run_server(host, port, udp=False, backlog=1, bufsize=1024, crlf=False, verbose=False):
-    '''Start TCP/UDP server on host/port and wait endlessly to sent/receive data'''
-
+    """Start TCP/UDP server on host/port and wait endlessly to sent/receive data."""
     s = create_socket(udp=udp, verbose=verbose)
 
     bind(s, host, port, verbose=verbose)
@@ -351,7 +348,7 @@ def run_server(host, port, udp=False, backlog=1, bufsize=1024, crlf=False, verbo
 # -------------------------------------------------------------------------------------------------
 
 def _args_check_port(value):
-    '''check arguments for invalid port number'''
+    """Check arguments for invalid port number."""
     min_port = 1
     max_port = 65535
     intvalue = int(value)
@@ -362,7 +359,7 @@ def _args_check_port(value):
 
 
 def get_args():
-    '''Retrieve command line arguments'''
+    """Retrieve command line arguments."""
     parser = argparse.ArgumentParser(description='Netcat implementation in Python.')
     parser.add_argument('-l', '--listen', action='store_true', required=False,
                         help='listen mode, for inbound connects')
@@ -382,8 +379,7 @@ def get_args():
 # -------------------------------------------------------------------------------------------------
 
 def main():
-    '''main entrypoint'''
-
+    """Start the program."""
     args = get_args()
 
     listen_backlog = 1
