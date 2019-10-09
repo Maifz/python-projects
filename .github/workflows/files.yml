@@ -1,6 +1,6 @@
 ---
 
-name: Python
+name: Files
 on: [pull_request]
 
 jobs:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        job: [files, json, python-pyc, python-pyd]
+        job: [files, json]
 
     name: "[ ${{ matrix.job }} ]"
     steps:
