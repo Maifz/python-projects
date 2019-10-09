@@ -2,7 +2,7 @@ ifneq (,)
 .error This Makefile requires GNU Make.
 endif
 
-.PHONY: all lint-files lint-json lint-python-black lint-python-pycodestyle lint-python-pydocstyle _pull-files _pull-json _pull-python-black _pull-python-pycodestyle _pull-python-pydocstyle
+.PHONY: all autoformat lint-files lint-json lint-python-black lint-python-pycodestyle lint-python-pydocstyle _pull-files _pull-json _pull-python-black _pull-python-pycodestyle _pull-python-pydocstyle
 
 # --------------------------------------------------------------------------------
 # File-lint configuration
@@ -22,12 +22,17 @@ JL_IGNORES = .idea/*
 # Targets
 # --------------------------------------------------------------------------------
 help:
+	@echo "autoformat               Autoformat Python files according to black"
 	@echo "lint-all                 Lint all targets below"
 	@echo "lint-files               Lint and test all files"
 	@echo "lint-json                Lint JSON files"
 	@echo "lint-python-pycodestyle  Lint Python files against pycodestyleodestyle"
 	@echo "lint-python-pydocstyle   Lint Python files against pydocstyleocstyle"
 	@echo "lint-python-black        Lint Python files against black (code formatter)"
+
+
+autoformat: _pull-python-black
+	docker run --rm -v ${PWD}:/data cytopia/black -l 100 .
 
 
 lint-all:
