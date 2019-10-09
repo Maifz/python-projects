@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Python netcat implementation for TCP."""
 
 import argparse
 import socket
@@ -11,7 +12,7 @@ import threading
 # -------------------------------------------------------------------------------------------------
 
 def b2str(data):
-    '''Convert bytes into string type'''
+    """Convert bytes into string type."""
     try:
         return data.decode('utf-8')
     except UnicodeDecodeError:
@@ -31,8 +32,7 @@ def b2str(data):
 # -------------------------------------------------------------------------------------------------
 
 def send(s, crlf=False, verbose=False):
-    '''Send one newline terminated line to a connected socket'''
-
+    """Send one newline terminated line to a connected socket."""
     # Loop for the thread
     while True:
         # Read user input
@@ -61,8 +61,7 @@ def send(s, crlf=False, verbose=False):
 
 
 def receive(s, bufsize=1024, verbose=False):
-    '''Read one newline terminated line from a connected socket'''
-
+    """Read one newline terminated line from a connected socket."""
     # Loop for the thread
     while True:
         data = ''
@@ -105,8 +104,7 @@ def receive(s, bufsize=1024, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def connect(host, port, bufsize=1024, crlf=False, verbose=False):
-    '''Connect to host:port and send data'''
-
+    """Connect to host:port and send data."""
     # Create socket
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -166,8 +164,7 @@ def connect(host, port, bufsize=1024, crlf=False, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
-    '''Listen on host:port and wait endlessly for client to send data'''
-
+    """Listen on host:port and wait endlessly for client to send data."""
     try:
         # Create server socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -227,7 +224,7 @@ def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def _args_check_port(value):
-    '''check arguments for invalid port number'''
+    """Check arguments for invalid port number."""
     min_port = 1
     max_port = 65535
     intvalue = int(value)
@@ -238,7 +235,7 @@ def _args_check_port(value):
 
 
 def get_args():
-    '''Retrieve command line arguments'''
+    """Retrieve command line arguments."""
     parser = argparse.ArgumentParser(description='Netcat implementation in Python.')
     parser.add_argument('-l', '--listen', action='store_true', required=False,
                         help='listen mode, for inbound connects')
@@ -256,8 +253,7 @@ def get_args():
 # -------------------------------------------------------------------------------------------------
 
 def main():
-    '''main entrypoint'''
-
+    """Start the program."""
     args = get_args()
 
     listen_backlog = 1
