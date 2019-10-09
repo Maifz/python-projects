@@ -23,25 +23,27 @@ UDP_CLIENT_PORT = None
 # HELPER FUNCTIONS
 # -------------------------------------------------------------------------------------------------
 
+
 def b2str(data):
     """Convert bytes into string type."""
     try:
-        return data.decode('utf-8')
+        return data.decode("utf-8")
     except UnicodeDecodeError:
         pass
     try:
-        return data.decode('utf-8-sig')
+        return data.decode("utf-8-sig")
     except UnicodeDecodeError:
         pass
     try:
-        return data.decode('ascii')
+        return data.decode("ascii")
     except UnicodeDecodeError:
-        return data.decode('latin-1')
+        return data.decode("latin-1")
 
 
 # -------------------------------------------------------------------------------------------------
 # CLIENT/SERVER COMMUNICATOIN FUNCTIONS
 # -------------------------------------------------------------------------------------------------
+
 
 def send(s, udp=False, crlf=False, verbose=False):
     """Send one newline terminated line to a connected socket."""
@@ -51,7 +53,7 @@ def send(s, udp=False, crlf=False, verbose=False):
         while UDP_CLIENT_ADDR is None and UDP_CLIENT_PORT is None:
             pass
         if verbose:
-            print('Client:     %s:%i' % (UDP_CLIENT_ADDR, UDP_CLIENT_PORT), file=sys.stderr)
+            print("Client:     %s:%i" % (UDP_CLIENT_ADDR, UDP_CLIENT_PORT), file=sys.stderr)
 
     # Loop for the thread
     while True:
@@ -78,7 +80,7 @@ def send(s, udp=False, crlf=False, verbose=False):
                 else:
                     send += s.send(data)
             except (OSError, socket.error) as error:
-                print('[Send Error] %s' % (error), file=sys.stderr)
+                print("[Send Error] %s" % (error), file=sys.stderr)
                 print(s, file=sys.stderr)
                 s.close()
                 # exit the thread
@@ -94,11 +96,11 @@ def receive(s, udp=False, bufsize=1024, verbose=False):
     global UDP_CLIENT_PORT
 
     if verbose:
-        print('Receiving:  bufsize=%i' % (bufsize), file=sys.stderr)
+        print("Receiving:  bufsize=%i" % (bufsize), file=sys.stderr)
 
     # Loop for the thread
     while True:
-        data = ''
+        data = ""
         size = len(data)
 
         while True:
@@ -119,7 +121,7 @@ def receive(s, udp=False, bufsize=1024, verbose=False):
                 sys.exit(1)
             if not data:
                 if verbose:
-                    print('[Receive Error] Upstream connection is gone', file=sys.stderr)
+                    print("[Receive Error] Upstream connection is gone", file=sys.stderr)
                 s.close()
                 # exit the thread
                 return
@@ -135,7 +137,7 @@ def receive(s, udp=False, bufsize=1024, verbose=False):
         data = data.rstrip("\r\n")
         data = data.rstrip("\n")
         if verbose:
-            print('< ', end='', flush=True, file=sys.stderr)
+            print("< ", end="", flush=True, file=sys.stderr)
         print(data)
 
     # Close connection when thread stops
@@ -154,14 +156,14 @@ def create_socket(udp=False, verbose=False):
     try:
         if udp:
             if verbose:
-                print('Socket:     UDP', file=sys.stderr)
+                print("Socket:     UDP", file=sys.stderr)
             return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         else:
             if verbose:
-                print('Socket:     TCP', file=sys.stderr)
+                print("Socket:     TCP", file=sys.stderr)
             return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as error:
-        print('[Socker Error] %s', (error), file=sys.stderr)
+        print("[Socker Error] %s", (error), file=sys.stderr)
         sys.exit(1)
 
 
@@ -171,11 +173,11 @@ def create_socket(udp=False, verbose=False):
 def bind(s, host, port, verbose=False):
     """Bind TCP or UDP socket to host/port."""
     if verbose:
-        print('Binding:    %s:%i' % (host, port), file=sys.stderr)
+        print("Binding:    %s:%i" % (host, port), file=sys.stderr)
     try:
         s.bind((host, port))
     except (OverflowError, OSError, socket.error) as error:
-        print('[Bind Error] %s' % (error), file=sys.stderr)
+        print("[Bind Error] %s" % (error), file=sys.stderr)
         print(s, file=sys.stderr)
         s.close()
         sys.exit(1)
@@ -188,10 +190,10 @@ def listen(s, backlog=1, verbose=False):
     """Make TCP socket listen."""
     try:
         if verbose:
-            print('Listening:  backlog=%i' % (backlog), file=sys.stderr)
+            print("Listening:  backlog=%i" % (backlog), file=sys.stderr)
         s.listen(backlog)
     except socket.error as error:
-        print('[Listen Error] %s', (error), file=sys.stderr)
+        print("[Listen Error] %s", (error), file=sys.stderr)
         print(s, file=sys.stderr)
         s.close()
         sys.exit(1)
@@ -205,14 +207,14 @@ def accept(s, verbose=False):
     try:
         c, addr = s.accept()
     except (socket.gaierror, socket.error) as error:
-        print('[Accept Error] %s', (error), file=sys.stderr)
+        print("[Accept Error] %s", (error), file=sys.stderr)
         print(s, file=sys.stderr)
         s.close()
         sys.exit(1)
 
     host, port = addr
     if verbose:
-        print('Client:     %s:%i' % (host, port), file=sys.stderr)
+        print("Client:     %s:%i" % (host, port), file=sys.stderr)
 
     return c
 
@@ -223,11 +225,11 @@ def accept(s, verbose=False):
 def resolve(hostname, verbose=False):
     """Resolve hostname to IP addr or return False in case of error."""
     if verbose:
-        print('Resolving:  %s' % (hostname), file=sys.stderr)
+        print("Resolving:  %s" % (hostname), file=sys.stderr)
     try:
         return socket.gethostbyname(hostname)
     except socket.gaierror as error:
-        print('[Resolve Error] %s' % (error), file=sys.stderr)
+        print("[Resolve Error] %s" % (error), file=sys.stderr)
         return False
 
 
@@ -237,11 +239,11 @@ def resolve(hostname, verbose=False):
 def connect(s, addr, port, verbose=False):
     """Connect to a server via IP addr/port."""
     if verbose:
-        print('Connecting: %s:%i' % (addr, port), file=sys.stderr)
+        print("Connecting: %s:%i" % (addr, port), file=sys.stderr)
     try:
         s.connect((addr, port))
     except socket.error as error:
-        print('[Connect Error] %s' % (error), file=sys.stderr)
+        print("[Connect Error] %s" % (error), file=sys.stderr)
         print(s, file=sys.stderr)
         s.close()
         sys.exit(1)
@@ -250,6 +252,7 @@ def connect(s, addr, port, verbose=False):
 # -------------------------------------------------------------------------------------------------
 # CLIENT
 # -------------------------------------------------------------------------------------------------
+
 
 def run_client(host, port, udp=False, bufsize=1024, crlf=False, verbose=False):
     """Connect to host:port and send data."""
@@ -270,16 +273,12 @@ def run_client(host, port, udp=False, bufsize=1024, crlf=False, verbose=False):
         connect(s, addr, port, verbose=verbose)
 
     # Start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(s, ), kwargs={
-        'udp': udp,
-        'bufsize': bufsize,
-        'verbose': verbose
-    })
-    ts = threading.Thread(target=send, args=(s, ), kwargs={
-        'udp': udp,
-        'crlf': crlf,
-        'verbose': verbose
-    })
+    tr = threading.Thread(
+        target=receive, args=(s,), kwargs={"udp": udp, "bufsize": bufsize, "verbose": verbose}
+    )
+    ts = threading.Thread(
+        target=send, args=(s,), kwargs={"udp": udp, "crlf": crlf, "verbose": verbose}
+    )
     # If the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
@@ -301,6 +300,7 @@ def run_client(host, port, udp=False, bufsize=1024, crlf=False, verbose=False):
 # SERVER
 # -------------------------------------------------------------------------------------------------
 
+
 def run_server(host, port, udp=False, backlog=1, bufsize=1024, crlf=False, verbose=False):
     """Start TCP/UDP server on host/port and wait endlessly to sent/receive data."""
     s = create_socket(udp=udp, verbose=verbose)
@@ -314,16 +314,12 @@ def run_server(host, port, udp=False, backlog=1, bufsize=1024, crlf=False, verbo
         c = s
 
     # start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(c, ), kwargs={
-        'udp': udp,
-        'bufsize': bufsize,
-        'verbose': verbose
-    })
-    ts = threading.Thread(target=send, args=(c, ), kwargs={
-        'udp': udp,
-        'crlf': crlf,
-        'verbose': verbose
-    })
+    tr = threading.Thread(
+        target=receive, args=(c,), kwargs={"udp": udp, "bufsize": bufsize, "verbose": verbose}
+    )
+    ts = threading.Thread(
+        target=send, args=(c,), kwargs={"udp": udp, "crlf": crlf, "verbose": verbose}
+    )
     # if the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
@@ -347,6 +343,7 @@ def run_server(host, port, udp=False, backlog=1, bufsize=1024, crlf=False, verbo
 # COMMAND LINE ARGUMENTS
 # -------------------------------------------------------------------------------------------------
 
+
 def _args_check_port(value):
     """Check arguments for invalid port number."""
     min_port = 1
@@ -360,23 +357,38 @@ def _args_check_port(value):
 
 def get_args():
     """Retrieve command line arguments."""
-    parser = argparse.ArgumentParser(description='Netcat implementation in Python.')
-    parser.add_argument('-l', '--listen', action='store_true', required=False,
-                        help='listen mode, for inbound connects')
-    parser.add_argument('-C', '--crlf', action='store_true', required=False,
-                        help='send CRLF as line-endings (default: LF)')
-    parser.add_argument('-u', '--udp', action='store_true', required=False,
-                        help='UDP mode')
-    parser.add_argument('-v', '--verbose', action='store_true', required=False,
-                        help='be verbose and print info to stderr')
-    parser.add_argument('hostname', type=str, help='address to listen or connect to')
-    parser.add_argument('port', type=_args_check_port, help='port to listen on or connect to')
+    parser = argparse.ArgumentParser(description="Netcat implementation in Python.")
+    parser.add_argument(
+        "-l",
+        "--listen",
+        action="store_true",
+        required=False,
+        help="listen mode, for inbound connects",
+    )
+    parser.add_argument(
+        "-C",
+        "--crlf",
+        action="store_true",
+        required=False,
+        help="send CRLF as line-endings (default: LF)",
+    )
+    parser.add_argument("-u", "--udp", action="store_true", required=False, help="UDP mode")
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        required=False,
+        help="be verbose and print info to stderr",
+    )
+    parser.add_argument("hostname", type=str, help="address to listen or connect to")
+    parser.add_argument("port", type=_args_check_port, help="port to listen on or connect to")
     return parser.parse_args()
 
 
 # -------------------------------------------------------------------------------------------------
 # MAIN ENTRYPOINT
 # -------------------------------------------------------------------------------------------------
+
 
 def main():
     """Start the program."""
@@ -393,7 +405,7 @@ def main():
             backlog=listen_backlog,
             bufsize=receive_buffer,
             crlf=args.crlf,
-            verbose=args.verbose
+            verbose=args.verbose,
         )
     else:
         run_client(
