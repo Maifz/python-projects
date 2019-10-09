@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Python multi-threaded webserver."""
 
 import argparse
 import os
@@ -13,7 +14,7 @@ import threading
 # -------------------------------------------------------------------------------------------------
 
 def b2str(data):
-    '''Convert bytes into string type'''
+    """Convert bytes into string type."""
     try:
         return data.decode('utf-8')
     except UnicodeDecodeError:
@@ -33,8 +34,7 @@ def b2str(data):
 # -------------------------------------------------------------------------------------------------
 
 def send(s, data, verbose=False):
-    '''Send data to a connected socket'''
-
+    """Send data to a connected socket."""
     # Ensure to terminate with desired newline
     if isinstance(data, bytes):
         data = b2str(data)
@@ -59,7 +59,7 @@ def send(s, data, verbose=False):
 
 
 def recv(s, bufsize=1024, verbose=False):
-    '''Receive data from a connected socket'''
+    """Receive data from a connected socket."""
     data = ''
     size = len(data)
 
@@ -96,8 +96,7 @@ def recv(s, bufsize=1024, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def retrieve_request(s, host, port, bufsize=1024, verbose=False):
-    '''Get client request'''
-
+    """Get client request."""
     data = recv(s, bufsize=bufsize, verbose=verbose)
 
     # Client disconnected unexpectedly (without sending anything)
@@ -126,8 +125,7 @@ def retrieve_request(s, host, port, bufsize=1024, verbose=False):
 
 
 def respond_get(s, path, vers, verbose=False):
-    '''Respond to a GET request to the client'''
-
+    """Respond to a GET request to the client."""
     if not os.path.isfile(path):
         send(s, 'HTTP/'+vers+' 404\r\n\r\nFile not found', verbose=verbose)
         return
@@ -157,8 +155,7 @@ def respond_get(s, path, vers, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def serve(s, host, port, docroot, index, bufsize=1024, verbose=False):
-    '''Threaded function to serve HTTP requests. One call per client'''
-
+    """Threaded function to serve HTTP requests. One call per client."""
     request = retrieve_request(s, host, port, bufsize=bufsize, verbose=verbose)
     if request is None:
         s.close()
@@ -187,7 +184,7 @@ def serve(s, host, port, docroot, index, bufsize=1024, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def create_socket(verbose=False):
-    '''Create TCP socket'''
+    """Create TCP socket."""
     try:
         if verbose:
             print('Socket:     TCP', file=sys.stderr)
@@ -198,7 +195,7 @@ def create_socket(verbose=False):
 
 
 def bind(s, host, port, verbose=False):
-    '''Bind TCP or UDP socket to host/port'''
+    """Bind TCP or UDP socket to host/port."""
     if verbose:
         print('Binding:    %s:%i' % (host, port), file=sys.stderr)
     try:
@@ -211,7 +208,7 @@ def bind(s, host, port, verbose=False):
 
 
 def listen(s, backlog=1, verbose=False):
-    '''Make TCP socket listen'''
+    """Make TCP socket listen."""
     try:
         if verbose:
             print('Listening:  backlog=%i' % (backlog), file=sys.stderr)
@@ -224,7 +221,7 @@ def listen(s, backlog=1, verbose=False):
 
 
 def accept(s, verbose=False):
-    '''Accept connections on TCP socket'''
+    """Accept connections on TCP socket."""
     try:
         c, addr = s.accept()
     except (socket.gaierror, socket.error) as error:
@@ -245,8 +242,7 @@ def accept(s, verbose=False):
 # -------------------------------------------------------------------------------------------------
 
 def run_server(host, port, docroot, index, backlog=1, bufsize=1024, verbose=False):
-    '''Start TCP/UDP server on host/port and wait endlessly to sent/receive data'''
-
+    """Start TCP/UDP server on host/port and wait endlessly to sent/receive data."""
     s = create_socket(verbose=verbose)
 
     bind(s, host, port, verbose=verbose)
@@ -279,7 +275,7 @@ def run_server(host, port, docroot, index, backlog=1, bufsize=1024, verbose=Fals
 # -------------------------------------------------------------------------------------------------
 
 def _args_check_port(value):
-    '''check arguments for invalid port number'''
+    """Check arguments for invalid port number."""
     min_port = 1
     max_port = 65535
     intvalue = int(value)
@@ -290,7 +286,7 @@ def _args_check_port(value):
 
 
 def _args_check_docroot(value):
-    '''check arguments for invalid port number'''
+    """Check arguments for invalid port number."""
     strvalue = str(value)
 
     if not os.path.exists(strvalue):
@@ -302,7 +298,7 @@ def _args_check_docroot(value):
 
 
 def get_args():
-    '''Retrieve command line arguments'''
+    """Retrieve command line arguments."""
     parser = argparse.ArgumentParser(description='Python httpd server.')
     parser.add_argument('-v', '--verbose', action='store_true', required=False,
                         help='be verbose and print info to stderr')
@@ -320,8 +316,7 @@ def get_args():
 # -------------------------------------------------------------------------------------------------
 
 def main():
-    '''main entrypoint'''
-
+    """Start the program."""
     args = get_args()
 
     listen_backlog = 1
