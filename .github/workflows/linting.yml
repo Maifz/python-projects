@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        job: [files, json, python]
+        job: [files, json, python-pyc, python-pyd]
 
     name: "[ ${{ matrix.job }} ]"
     steps:
