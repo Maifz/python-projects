@@ -1,7 +1,7 @@
 # Python projects
 
-![](https://github.com/cytopia/python-projects/workflows/Files/badge.svg)
-![](https://github.com/cytopia/python-projects/workflows/Python/badge.svg)
+[![](https://github.com/cytopia/python-projects/workflows/Files/badge.svg)](https://github.com/cytopia/python-projects/actions?workflow=Files)
+[![](https://github.com/cytopia/python-projects/workflows/Python/badge.svg)](https://github.com/cytopia/python-projects/actions?workflow=Python)
 [![](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
