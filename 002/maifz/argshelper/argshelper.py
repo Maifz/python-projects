@@ -1,5 +1,6 @@
 """Argshelper class."""
 
+
 class ArgsHelper:
     """Singleton."""
 

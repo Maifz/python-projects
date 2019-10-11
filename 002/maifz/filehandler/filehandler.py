@@ -1,6 +1,7 @@
 """Filehandler class."""
 import os
 
+
 class FileHandler:
     """Filehandler helper for read and write."""
 
