@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Python webserver."""
 import argparse
 import sys
 from http.server import HTTPServer
@@ -8,11 +9,18 @@ from argshelper.argshelper import ArgsHelper
 
 
 class Webserver(BaseHTTPRequestHandler):
+    """Main class, defines get and post handling."""
+
     file_handler = FileHandler()
 
     args_helper = ArgsHelper.getInstance()
 
     def do_GET(self):
+        """Overwrite do_GET function of SimpleHTTPRequestHandler.
+
+        - serve file of passed path
+        - @throws 404 FileNotFoundError
+        """
         try:
             self.wfile.write(Webserver.file_handler.readFile(self.args_helper.getIndexFilePath()))
         except FileNotFoundError:
@@ -24,6 +32,11 @@ class Webserver(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
+        """Overwrite post function of SimpleHTTPRequestHandler.
+
+        - write posted text into file of given path
+        - send 404 if file is not existing
+        """
         try:
             content_length = int(self.headers["Content-Length"])
             post_data = self.rfile.read(content_length)
@@ -51,11 +64,17 @@ DEFAULT_INDEX_FILE = "index.html"
 
 
 def run_server(server_address, port):
+    """Initialize HTTPServer object and runs the server."""
     server = HTTPServer((server_address, port), Webserver)
     server.serve_forever()
 
 
 def main():
+    """Start the Application.
+
+    - calls run_server
+    - argument parsing
+    """
     parser = argparse.ArgumentParser(description="Simple Webserver")
     parser.add_argument(
         "-l",
