@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Python netcat implementation for TCP."""
 
 import argparse
 import socket
@@ -10,29 +11,30 @@ import threading
 # HELPER FUNCTIONS
 # -------------------------------------------------------------------------------------------------
 
+
 def b2str(data):
-    '''Convert bytes into string type'''
+    """Convert bytes into string type."""
     try:
-        return data.decode('utf-8')
+        return data.decode("utf-8")
     except UnicodeDecodeError:
         pass
     try:
-        return data.decode('utf-8-sig')
+        return data.decode("utf-8-sig")
     except UnicodeDecodeError:
         pass
     try:
-        return data.decode('ascii')
+        return data.decode("ascii")
     except UnicodeDecodeError:
-        return data.decode('latin-1')
+        return data.decode("latin-1")
 
 
 # -------------------------------------------------------------------------------------------------
 # CLIENT/SERVER FUNCTIONS
 # -------------------------------------------------------------------------------------------------
 
-def send(s, crlf=False, verbose=False):
-    '''Send one newline terminated line to a connected socket'''
 
+def send(s, crlf=False, verbose=False):
+    """Send one newline terminated line to a connected socket."""
     # Loop for the thread
     while True:
         # Read user input
@@ -51,7 +53,7 @@ def send(s, crlf=False, verbose=False):
             s.sendall(data.encode())
         except socket.error:
             if verbose:
-                print('Upstream connection is gone while sending', file=sys.stderr)
+                print("Upstream connection is gone while sending", file=sys.stderr)
             s.close()
             # exit the thread
             return
@@ -61,11 +63,10 @@ def send(s, crlf=False, verbose=False):
 
 
 def receive(s, bufsize=1024, verbose=False):
-    '''Read one newline terminated line from a connected socket'''
-
+    """Read one newline terminated line from a connected socket."""
     # Loop for the thread
     while True:
-        data = ''
+        data = ""
         size = len(data)
 
         while True:
@@ -77,7 +78,7 @@ def receive(s, bufsize=1024, verbose=False):
                 sys.exit(1)
             if not data:
                 if verbose:
-                    print('upstream connection is gone while receiving', file=sys.stderr)
+                    print("upstream connection is gone while receiving", file=sys.stderr)
                 s.close()
                 # exit the thread
                 return
@@ -93,7 +94,7 @@ def receive(s, bufsize=1024, verbose=False):
         data = data.rstrip("\r\n")
         data = data.rstrip("\n")
         if verbose:
-            print('< ', end='', flush=True, file=sys.stderr)
+            print("< ", end="", flush=True, file=sys.stderr)
         print(data)
 
     # Close connection when thread stops
@@ -104,9 +105,9 @@ def receive(s, bufsize=1024, verbose=False):
 # CLIENT FUNCTIONS
 # -------------------------------------------------------------------------------------------------
 
-def connect(host, port, bufsize=1024, crlf=False, verbose=False):
-    '''Connect to host:port and send data'''
 
+def connect(host, port, bufsize=1024, crlf=False, verbose=False):
+    """Connect to host:port and send data."""
     # Create socket
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -117,7 +118,7 @@ def connect(host, port, bufsize=1024, crlf=False, verbose=False):
 
     # Get remote IP
     if verbose:
-        print('Resolving:  ', host, file=sys.stderr)
+        print("Resolving:  ", host, file=sys.stderr)
     try:
         addr = socket.gethostbyname(host)
     except socket.gaierror as msg:
@@ -127,7 +128,7 @@ def connect(host, port, bufsize=1024, crlf=False, verbose=False):
 
     # Bind socket
     if verbose:
-        print('Connecting: ', addr + ':' + str(port), file=sys.stderr)
+        print("Connecting: ", addr + ":" + str(port), file=sys.stderr)
     try:
         s.connect((addr, port))
     except socket.error as msg:
@@ -136,14 +137,10 @@ def connect(host, port, bufsize=1024, crlf=False, verbose=False):
         sys.exit(1)
 
     # Start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(s, ), kwargs={
-        'bufsize': bufsize,
-        'verbose': verbose
-    })
-    ts = threading.Thread(target=send, args=(s, ), kwargs={
-        'crlf': crlf,
-        'verbose': verbose
-    })
+    tr = threading.Thread(
+        target=receive, args=(s,), kwargs={"bufsize": bufsize, "verbose": verbose}
+    )
+    ts = threading.Thread(target=send, args=(s,), kwargs={"crlf": crlf, "verbose": verbose})
     # If the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
@@ -165,21 +162,21 @@ def connect(host, port, bufsize=1024, crlf=False, verbose=False):
 # SERVER FUNCTIONS
 # -------------------------------------------------------------------------------------------------
 
-def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
-    '''Listen on host:port and wait endlessly for client to send data'''
 
+def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
+    """Listen on host:port and wait endlessly for client to send data."""
     try:
         # Create server socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Bind socket
         if verbose:
-            print('Binding:   ', host + ':' + str(port), file=sys.stderr)
+            print("Binding:   ", host + ":" + str(port), file=sys.stderr)
         s.bind((host, port))
 
         # Listen on socket
         if verbose:
-            print('Listening:', ' backlog=' + str(backlog), file=sys.stderr)
+            print("Listening:", " backlog=" + str(backlog), file=sys.stderr)
         s.listen(backlog)
 
     except (OverflowError, socket.error) as msg:
@@ -191,18 +188,14 @@ def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
     c, addr = s.accept()
     host, port = addr
     if verbose:
-        print('Connected: ', str(host) + ':' + str(port), file=sys.stderr)
-        print('Receiving: ', 'bufsize=' + str(bufsize), file=sys.stderr)
+        print("Connected: ", str(host) + ":" + str(port), file=sys.stderr)
+        print("Receiving: ", "bufsize=" + str(bufsize), file=sys.stderr)
 
     # Start sending and receiving threads
-    tr = threading.Thread(target=receive, args=(c, ), kwargs={
-        'bufsize': bufsize,
-        'verbose': verbose
-    })
-    ts = threading.Thread(target=send, args=(c, ), kwargs={
-        'crlf': crlf,
-        'verbose': verbose
-    })
+    tr = threading.Thread(
+        target=receive, args=(c,), kwargs={"bufsize": bufsize, "verbose": verbose}
+    )
+    ts = threading.Thread(target=send, args=(c,), kwargs={"crlf": crlf, "verbose": verbose})
     # If the main thread kills, this thread will be killed too.
     tr.daemon = True
     ts.daemon = True
@@ -226,8 +219,9 @@ def listen(host, port, backlog=1, bufsize=1024, crlf=False, verbose=False):
 # COMMAND LINE ARGUMENTS
 # -------------------------------------------------------------------------------------------------
 
+
 def _args_check_port(value):
-    '''check arguments for invalid port number'''
+    """Check arguments for invalid port number."""
     min_port = 1
     max_port = 65535
     intvalue = int(value)
@@ -238,16 +232,31 @@ def _args_check_port(value):
 
 
 def get_args():
-    '''Retrieve command line arguments'''
-    parser = argparse.ArgumentParser(description='Netcat implementation in Python.')
-    parser.add_argument('-l', '--listen', action='store_true', required=False,
-                        help='listen mode, for inbound connects')
-    parser.add_argument('-C', '--crlf', action='store_true', required=False,
-                        help='send CRLF as line-endings (default: LF)')
-    parser.add_argument('-v', '--verbose', action='store_true', required=False,
-                        help='be verbose and print info to stderr')
-    parser.add_argument('hostname', type=str, help='address to listen or connect to')
-    parser.add_argument('port', type=_args_check_port, help='port to listen on or connect to')
+    """Retrieve command line arguments."""
+    parser = argparse.ArgumentParser(description="Netcat implementation in Python.")
+    parser.add_argument(
+        "-l",
+        "--listen",
+        action="store_true",
+        required=False,
+        help="listen mode, for inbound connects",
+    )
+    parser.add_argument(
+        "-C",
+        "--crlf",
+        action="store_true",
+        required=False,
+        help="send CRLF as line-endings (default: LF)",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        required=False,
+        help="be verbose and print info to stderr",
+    )
+    parser.add_argument("hostname", type=str, help="address to listen or connect to")
+    parser.add_argument("port", type=_args_check_port, help="port to listen on or connect to")
     return parser.parse_args()
 
 
@@ -255,9 +264,9 @@ def get_args():
 # MAIN ENTRYPOINT
 # -------------------------------------------------------------------------------------------------
 
-def main():
-    '''main entrypoint'''
 
+def main():
+    """Start the program."""
     args = get_args()
 
     listen_backlog = 1
@@ -270,16 +279,12 @@ def main():
             backlog=listen_backlog,
             bufsize=receive_buffer,
             crlf=args.crlf,
-            verbose=args.verbose
+            verbose=args.verbose,
         )
 
     else:
         connect(
-            args.hostname,
-            args.port,
-            bufsize=receive_buffer,
-            crlf=args.crlf,
-            verbose=args.verbose,
+            args.hostname, args.port, bufsize=receive_buffer, crlf=args.crlf, verbose=args.verbose
         )
 
 
