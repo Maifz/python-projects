@@ -2,7 +2,21 @@
 """Python tree implementation."""
 
 import argparse
+import os
 import sys
+
+
+# -------------------------------------------------------------------------------------------------
+# COMMAND LINE ARGUMENTS
+# -------------------------------------------------------------------------------------------------
+
+
+def _args_check_path(value):
+    """Check if path exists."""
+    if not os.path.isdir(value):
+        raise argparse.ArgumentTypeError("%s directory does not exist." % value)
+
+    return value
 
 
 def get_args():
@@ -28,6 +42,13 @@ def get_args():
         required=False,
         help="Print the size of each file but in a more human readable way.",
     )
+    parser.add_argument(
+        "path",
+        type=_args_check_path,
+        nargs="?",
+        default=".",
+        help="address to listen or connect to",
+    )
     return parser.parse_args()
 
 
@@ -39,6 +60,7 @@ def get_args():
 def main():
     """Start the program."""
     args = get_args()
+    print(args)
 
 
 if __name__ == "__main__":
