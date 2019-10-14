@@ -95,6 +95,21 @@ lint-python-pydocstyle: _pull-python-pydocstyle
 
 
 # --------------------------------------------------------------------------------
+# Test Targets
+# --------------------------------------------------------------------------------
+
+test-003:
+ifeq ($(ARGS),cytopia)
+else
+ifeq ($(ARGS),maifz)
+else
+	@$(error You must specify ARGS=cytopia or ARGS=maifz)
+endif
+endif
+	$(PWD)/tests/003.sh $(ARGS)
+
+
+# --------------------------------------------------------------------------------
 # Helper Targets
 # --------------------------------------------------------------------------------
 _pull-files:

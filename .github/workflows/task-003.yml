@@ -1,0 +1,22 @@
+---
+
+name: Task003
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job: [cytopia, maifz]
+
+    name: "[ ${{ matrix.job }} ]"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Run
+        run: |
+          make test-003 "ARGS=${job}"
+        env:
+          job: ${{ matrix.job }}
