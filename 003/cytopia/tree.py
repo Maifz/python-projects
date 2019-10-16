@@ -3,63 +3,16 @@
 
 import argparse
 import os
-import re
 import sys
-from functools import cmp_to_key
-
+import locale
 
 # -------------------------------------------------------------------------------------------------
 # GLOBALS
 # -------------------------------------------------------------------------------------------------
 
-# Compiled regex to check for alphanumerics
-IS_ALPHANUM = re.compile(r'[a-zA-Z0-9]')
-
 # Keep track of num of dirs and files
-CNT_FILES = 0
 CNT_DIRS = 0
-
-
-# -------------------------------------------------------------------------------------------------
-# SORT FUNCTIONS
-# -------------------------------------------------------------------------------------------------
-
-
-def sort_default(a, b):
-    """
-    Sort dirs/files by default tree sorting.
-
-    returns 0 if elements are equal
-    returns -1 if a is smaller than b
-    returns 1 if a is greater than b
-    """
-    # Both characters are alphanumeric
-    if IS_ALPHANUM.match(a[0]) and IS_ALPHANUM.match(b[0]):
-        if a[0].lower() < b[0].lower():
-            return -1
-        elif a[0].lower() > b[0].lower():
-            return 1
-    # Only a is alphanumeric
-    elif IS_ALPHANUM.match(a[0]) and IS_ALPHANUM.match(b[0]) is None:
-        if len(b) > 1:
-            return sort_default(a, b[1:])
-        return 1
-    # Only b is alphanumeric
-    elif IS_ALPHANUM.match(a[0]) is None and IS_ALPHANUM.match(b[0]):
-        if len(a) > 1:
-            return sort_default(a[1:], b)
-        return -1
-
-    # Nothing matches, compare the next character if it has it
-    if len(a) == 1 and len(b) == 1:
-        return -1 if ord(a[0]) <= ord(b[0]) else 0
-    elif len(a) == 1 and len(b) > 1:
-        return -1
-    elif len(a) > 1 and len(b) == 1:
-        return 1
-    else:
-        # Remove first from both strings char and recurse
-        return sort_default(a[1:], b[1:])
+CNT_FILES = 0
 
 
 # -------------------------------------------------------------------------------------------------
@@ -67,27 +20,81 @@ def sort_default(a, b):
 # -------------------------------------------------------------------------------------------------
 
 
+def get_size(path, do_print=False):
+    """Get size of dir/file in a formatted way."""
+    if not do_print:
+        return ""
+    # size in bytes
+    size = int(os.path.getsize(path))
+
+    zetta = 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+    exa = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+    peta = 1024 * 1024 * 1024 * 1024 * 1024
+    tera = 1024 * 1024 * 1024 * 1024
+    giga = 1024 * 1024 * 1024
+    mega = 1024 * 1024
+    kilo = 1024
+
+    if size >= zetta:
+        result = size / zetta
+        unit = "Z"
+    elif size >= exa:
+        result = size / exa
+        unit = "E"
+    elif size >= peta:
+        result = size / peta
+        unit = "P"
+    elif size >= tera:
+        result = size / tera
+        unit = "T"
+    elif size >= giga:
+        result = size / giga
+        unit = "G"
+    elif size >= mega:
+        result = size / mega
+        unit = "M"
+    elif size >= kilo:
+        result = size / kilo
+        unit = "K"
+    # size < 1024:
+    else:
+        result = size
+        unit = None
+
+    if unit is not None:
+        if result >= 10:
+            output = "{:.0f}{}".format(result, unit)
+        else:
+            output = "{:.1f}{}".format(result, unit)
+    else:
+        output = "{}".format(result)
+
+    return "[{:>4}]  ".format(output)
+
+
 def retrieve_files(path, hidden=False, dir_only=False):
     """Retrieve files/dirs from a path based on criteria."""
     # Get files
     files = os.listdir(path=path)
-
     # Remove hidden files/dirs (anything that starts with dot)
     if not hidden:
-        files = list(filter(lambda x: True if not x.startswith('.') else False, files))
+        files = list(filter(lambda x: True if not x.startswith(".") else False, files))
     # Remove files and only keep directories
     if dir_only:
         files = list(filter(lambda x, path=path: os.path.isdir(os.path.join(path, x)), files))
     # Sort files
-    files = sorted(files, key=cmp_to_key(sort_default))
+    collate = os.environ["LC_ALL"] if "LC_ALL" in os.environ else "C"
+    locale.setlocale(locale.LC_COLLATE, collate)
+    files.sort(key=locale.strxfrm)
 
     return files
 
 
-def print_tree(path, hidden=False, dir_only=False, level=None, curr_level=1, prevs=[]):
+def print_tree(path, hidden=False, dir_only=False, human=False, level=None, curr_level=1, prevs=[]):
     """Get files recursively."""
     global CNT_DIRS
     global CNT_FILES
+
     # Get files and sort alphabetically
     files = retrieve_files(path, hidden=hidden, dir_only=dir_only)
     total = len(files)
@@ -96,42 +103,45 @@ def print_tree(path, hidden=False, dir_only=False, level=None, curr_level=1, pre
     for idx, f in enumerate(files):
         abs_path = os.path.join(path, f)
 
+        if os.path.isdir(abs_path):
+            CNT_DIRS += 1
+        else:
+            CNT_FILES += 1
+
         # Print previous recursion round delimiter
         for delim in prevs:
-            print(delim, end='')
+            print(delim, end="")
 
         # If it is the last element on the current level, then
         # print the sign that shows the last element
         if idx == last:
-            print('%s' % ('└── '), end='')
+            print("%s" % ("└── "), end="")
         # If more elements are to come, then we print the sign,
         # that has continuation
         else:
-            print('%s' % ('├── '), end='')
-        print('%s' % f)
+            print("%s" % ("├── "), end="")
+        print("%s%s" % (get_size(abs_path, human), f))
 
         if level is None or level > curr_level:
             if os.path.isdir(abs_path):
-                CNT_DIRS += 1
                 # Build delimiter for next recursion round
                 tmp = prevs.copy()
 
                 # If it is not the last element on this level, (there is an element after it)
                 # we need to print the dashes until the element is reached
                 if idx < last:
-                    tmp.append('│   ')
+                    tmp.append("│   ")
                 # If it is the last element on this level, we do not print
                 # the continuation line, but just empty spaces.
                 else:
-                    tmp.append('    ')
+                    tmp.append("    ")
 
-                print_tree(abs_path, hidden, dir_only, level, curr_level+1, tmp)
-            else:
-                CNT_FILES += 1
+                # Recurse for directories
+                print_tree(abs_path, hidden, dir_only, human, level, curr_level + 1, tmp)
 
 
 # -------------------------------------------------------------------------------------------------
-# COMMAND LINE ARGUMENTS
+# ARG CHECKERS
 # -------------------------------------------------------------------------------------------------
 
 
@@ -156,6 +166,11 @@ def _args_check_path(value):
     return value
 
 
+# -------------------------------------------------------------------------------------------------
+# COMMAND LINE ARGUMENTS
+# -------------------------------------------------------------------------------------------------
+
+
 def get_args():
     """Retrieve command line arguments."""
     parser = argparse.ArgumentParser(description="Python tree implementation.")
@@ -175,7 +190,7 @@ def get_args():
         metavar="lvl",
         type=_args_check_level,
         required=False,
-        help="Max display depth of directory tree."
+        help="Max display depth of directory tree.",
     )
     parser.add_argument(
         "-H",
@@ -204,17 +219,20 @@ def main():
     args = get_args()
 
     print(args.path)
-    print_tree(args.path, args.all, args.dir, args.level)
+    print_tree(args.path, args.all, args.dir, args.human, args.level)
 
     if args.dir:
-        print("\n%i %s" % (CNT_DIRS, 'directory' if CNT_DIRS == 1 else 'directories'))
+        print("\n%i %s" % (CNT_DIRS, "directory" if CNT_DIRS == 1 else "directories"))
     else:
-        print("\n%i %s, %i %s" % (
-            CNT_DIRS,
-            'directory' if CNT_DIRS == 1 else 'directories',
-            CNT_FILES,
-            'file' if CNT_FILES == 1 else 'files',
-        ))
+        print(
+            "\n%i %s, %i %s"
+            % (
+                CNT_DIRS,
+                "directory" if CNT_DIRS == 1 else "directories",
+                CNT_FILES,
+                "file" if CNT_FILES == 1 else "files",
+            )
+        )
 
 
 if __name__ == "__main__":

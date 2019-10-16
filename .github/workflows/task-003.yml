@@ -15,6 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@master
 
+      - name: Install requirements
+        run: |
+          sudo apt-get update
+          sudo apt-get install tree
+
+      - name: Print environment
+        run: |
+          env
+
       - name: Run
         run: |
           make test-003 "ARGS=${job}"
