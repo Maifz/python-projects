@@ -26,15 +26,15 @@ def get_size(path, do_print=False):
         return ""
     # size in bytes
     size = int(os.path.getsize(path))
-
-    yotta = 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
-    zetta = 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
-    exa = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
-    peta = 1024 * 1024 * 1024 * 1024 * 1024
-    tera = 1024 * 1024 * 1024 * 1024
-    giga = 1024 * 1024 * 1024
-    mega = 1024 * 1024
+    # sizes in unites
     kilo = 1024
+    mega = kilo * 1024
+    giga = mega * 1024
+    tera = giga * 1024
+    peta = tera * 1024
+    exa = peta * 1024
+    zetta = exa * 1024
+    yotta = zetta * 1024
 
     if size >= yotta:
         result = size / yotta
