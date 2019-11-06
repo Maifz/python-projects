@@ -20,7 +20,11 @@ create_dirs() {
 	mkdir -p "${prefix}/001/cytopia/.aaa"
 	mkdir -p "${prefix}/001/001"
 	mkdir -p "${prefix}/001/002"
+	mkdir -p "${prefix}/001/_001"
 	mkdir -p "${prefix}/001/.001"
+	mkdir -p "${prefix}/001/.0.01"
+	mkdir -p "${prefix}/001/.0.02"
+	mkdir -p "${prefix}/001/_002"
 	mkdir -p "${prefix}/001/.002"
 	mkdir -p "${prefix}/001/.cytopia/aaa"
 	mkdir -p "${prefix}/001/.cytopia/_mmm"
@@ -98,8 +102,8 @@ fi
 
 ABS_PATH="${SCRIPTPATH}/../${EXCERCISE}/${1}/${FILENAME}"
 if [ ! -f "${ABS_PATH}" ]; then
-	echo "Error, file not found: '${ABS_PATH}'"
-	exit 1
+	echo "Tree not available: '${ABS_PATH}'"
+	exit 0
 fi
 
 
