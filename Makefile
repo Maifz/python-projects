@@ -22,13 +22,14 @@ JL_IGNORES = .idea/*
 # Targets
 # --------------------------------------------------------------------------------
 help:
-	@echo "autoformat               Autoformat Python files according to black"
-	@echo "lint-all                 Lint all targets below"
-	@echo "lint-files               Lint and test all files"
-	@echo "lint-json                Lint JSON files"
-	@echo "lint-python-pycodestyle  Lint Python files against pycodestyleodestyle"
-	@echo "lint-python-pydocstyle   Lint Python files against pydocstyleocstyle"
-	@echo "lint-python-black        Lint Python files against black (code formatter)"
+	@echo "autoformat               	Autoformat Python files according to black"
+	@echo "lint-all                 	Lint all targets below"
+	@echo "lint-files               	Lint and test all files"
+	@echo "lint-json                	Lint JSON files"
+	@echo "lint-python-pycodestyle  	Lint Python files against pycodestyleodestyle"
+	@echo "lint-python-pydocstyle   	Lint Python files against pydocstyleocstyle"
+	@echo "lint-python-black        	Lint Python files against black (code formatter)"
+	@echo "create-project-flask-mongo	Creates a new project based on Flask and Mongo"
 
 
 autoformat: _pull-python-black
