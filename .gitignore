@@ -3,3 +3,5 @@
 __pycache__/
 .gitconfig
 .env
+
+templates/**/src
