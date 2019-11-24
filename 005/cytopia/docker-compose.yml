@@ -12,6 +12,10 @@ services:
     image: cytopia/flagodo:latest
     hostname: flagodo
     restart: always
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./api/src:/home/flagodo/flagodo/src
   mongo:
     image: mongo:4.2-bionic
     hostname: mongo
