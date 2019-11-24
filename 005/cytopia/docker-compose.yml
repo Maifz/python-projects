@@ -1,0 +1,21 @@
+---
+version: '3.1'
+
+services:
+  web:
+    image: cytopia/web:latest
+    hostname: web
+    restart: always
+    ports:
+      - "80:80"
+  flagodo:
+    image: cytopia/flagodo:latest
+    hostname: flagodo
+    restart: always
+  mongo:
+    image: mongo:4.2-bionic
+    hostname: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD
