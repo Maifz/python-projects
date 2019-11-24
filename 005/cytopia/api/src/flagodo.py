@@ -7,4 +7,4 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     """Asdasd asd asd asd."""
-    return '<span style="color:red">Helo World!</span>'
+    return '<span style="color:red">Hello World!</span>'

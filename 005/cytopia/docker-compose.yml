@@ -8,14 +8,18 @@ services:
     restart: always
     ports:
       - "80:80"
-  flagodo:
-    image: cytopia/flagodo:latest
-    hostname: flagodo
+  flagodo-dev:
+    image: cytopia/flagodo:dev
+    hostname: flagodo-dev
     restart: always
     ports:
       - "8090:8080"
     volumes:
       - ./api/src:/home/flagodo/flagodo/src
+  flagodo-prod:
+    image: cytopia/flagodo:prod
+    hostname: flagodo-prod
+    restart: always
   mongo:
     image: mongo:4.2-bionic
     hostname: mongo
