@@ -10,13 +10,14 @@
 ```bash
 $ make help
 
-autoformat               Autoformat Python files according to black
-lint-all                 Lint all targets below
-lint-files               Lint and test all files
-lint-json                Lint JSON files
-lint-python-pycodestyle  Lint Python files against pycodestyleodestyle
-lint-python-pydocstyle   Lint Python files against pydocstyleocstyle
-lint-python-black        Lint Python files against black (code formatter)
+autoformat                  Autoformat Python files according to black
+lint-all                    Lint all targets below
+lint-files                  Lint and test all files
+lint-json                   Lint JSON files
+lint-python-pycodestyle     Lint Python files against pycodestyleodestyle
+lint-python-pydocstyle      Lint Python files against pydocstyleocstyle
+lint-python-black           Lint Python files against black (code formatter)
+create-project-flask-mongo  Creates a new project based on Flask and Mongo
 ```
 
 
