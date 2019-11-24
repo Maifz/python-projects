@@ -110,6 +110,26 @@ endif
 
 
 # --------------------------------------------------------------------------------
+# Project Targets
+# --------------------------------------------------------------------------------
+#
+create-project-flask-mongo:
+	@if [ "$(USER)" != "cytopia" ] && [ "$(USER)" != "maifz" ]; then \
+		echo "You must specify USER=cytopia or USER=maifz"; \
+		exit 1; \
+	fi;
+	@if [ -z "$(NUM)" ]; then \
+		echo "You must specify NUM, e.g.: NUM=005"; \
+		exit 1; \
+	fi;
+	@mkdir -p "$(NUM)/$(USER)"
+	@if [ ! -f $(NUM)/$(USER)/Makefile ]; then \
+		cp templates/makefiles/Makefile.flask-mongo $(NUM)/$(USER)/Makefile; \
+		cd $(NUM)/$(USER) && make init; \
+	fi
+
+
+# --------------------------------------------------------------------------------
 # Helper Targets
 # --------------------------------------------------------------------------------
 _pull-files:
