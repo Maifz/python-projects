@@ -1,0 +1,38 @@
+---
+version: '3.1'
+
+services:
+  web:
+    image: web:latest
+    hostname: web
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - app-prod
+
+  app-dev:
+    image: app:dev
+    hostname: app-dev
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app/src:/home/myuser/project/src
+    depends_on:
+      - mongo
+
+  app-prod:
+    image: app:prod
+    hostname: app-prod
+    restart: always
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:4.2-bionic
+    hostname: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
